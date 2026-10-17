@@ -1,0 +1,2207 @@
+{
+  "name": "Pipeline Harian",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        304,
+        112
+      ],
+      "id": "3fa56a62-33af-40c2-bb4f-0cb4f6f8639c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8924734-f0e0-416d-95ce-d51b40b2ef27",
+              "name": "=slot",
+              "value": "={{ $now.hour < 12 ? 'pagi' : 'sore' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        752,
+        112
+      ],
+      "id": "d7196bd5-f428-4deb-bd29-1d4e17747e3a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Kalender Tema",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        112
+      ],
+      "id": "ee1baf18-f7dc-42d9-8b7d-9ce29fa796e3",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5331390153",
+        "text": "=📋 Rencana konten hari ini  🗓️ {{ $json.Tanggal }} — Slot {{ $json.Slot }} 📌 Pilar: {{ $json.Pilar }} 💡 Tema: {{ $json.Tema }} 🎨 Format visual: {{ $json['Format Visual'] }}{{ $json['Format Visual'] === 'carousel' ? ' (' + $json['Jumlah Slide'] + ' slide)' : '' }} ⏰ Estimasi posting: dalam 10 menit  Mau diubah? Kirim arahanmu di chat ini (boleh sertakan foto referensi), atau tekan Lanjut sekarang. Tulis \"pakai gambar AI\" kalau mau versi ilustrasi (default: kartu). Kalau tidak ada pesan, konten dibuat sesuai rencana di atas.",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "▶️ Lanjut sekarang",
+                    "additionalFields": {
+                      "callback_data": "lanjut"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        288
+      ],
+      "id": "6c9265a9-744b-4b30-bfe5-87e167883e2f",
+      "name": "Send a text message",
+      "webhookId": "423ad857-359d-4e93-9976-f436826967ab",
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "limitWaitTime": true,
+        "resumeAmount": 10,
+        "resumeUnit": "minutes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        288
+      ],
+      "id": "00f6a787-f697-4541-81a2-165ca3ec9682",
+      "name": "Wait",
+      "webhookId": "0e678b80-7911-4aee-9c19-b0eee00c795d"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=2"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        288
+      ],
+      "id": "9c42d7a8-070a-49c6-8c76-0e425d19211a",
+      "name": "Get row(s) in sheet1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1dd812b7-3356-4bc6-81fa-29605b7ed404",
+              "leftValue": "=     {{ $json.Status }}",
+              "rightValue": "new",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        784
+      ],
+      "id": "e51882b2-22f1-49cb-8918-0c794ee3ac43",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = $now.toFormat('yyyy-MM-dd');\nconst targetSlot = $('Edit Fields').first().json.slot;\n\nconst matched = $input.all().filter(item => \n  item.json.Tanggal === today && item.json.Slot === targetSlot\n);\n\nif (matched.length === 0) {\n  throw new Error(`Tidak ada data untuk tanggal ${today} slot ${targetSlot}`);\n}\n\nreturn matched;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        288
+      ],
+      "id": "c72c65cd-ee83-4abd-abdb-2d8bfdf1e2e2",
+      "name": "Filter Tema Hari Ini"
+    },
+    {
+      "parameters": {
+        "jsCode": "const original = $('Filter Tema Hari Ini').first().json;\n\nreturn [{\n  json: {\n    tanggal: original.Tanggal,\n    slot: original.Slot,\n    pilar: original.Pilar,\n    tema: original.Tema,\n    format_visual: original['Format Visual'],\n    jumlah_slide: original['Jumlah Slide'],\n    sumber: 'default_kalender',\n    arahan_tambahan: '',\n    akun: original.Akun || '',\n    mode_visual: original['Mode Visual'] || '',\n    revisi: 'semua',\n    caption_lama: '',\n    gambar_lama: ''\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        784
+      ],
+      "id": "343b9474-ee52-4880-8e50-f7baf5295976",
+      "name": "Siapkan Konten - Default"
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $json;\nlet o = {};\ntry { o = $('Filter Tema Hari Ini').first().json; } catch (e) {}\nconst pick = (...v) => v.find(x => x !== undefined && x !== null && String(x).trim() !== '');\nconst fmt = pick(j['Format Visual'], j.format_visual, o['Format Visual'], 'single');\nconst jml = Number(pick(j['Jumlah Slide'], j.jumlah_slide, o['Jumlah Slide'], 1)) || 1;\nlet revisi = pick(j.Revisi, 'semua');\nconst capLama = pick(j.CaptionLama, '') || '';\nconst gamLama = pick(j.GambarLama, '') || '';\nif (revisi === 'visual' && !capLama) revisi = 'semua';\nif (revisi === 'copy' && !gamLama) revisi = 'semua';\nreturn [{ json: {\n  tanggal: pick(j.Tanggal, j.tanggal, o.Tanggal, $now.toFormat('yyyy-MM-dd')),\n  slot: pick(j.Slot, j.slot, o.Slot, $now.hour < 12 ? 'pagi' : 'sore'),\n  pilar: pick(j.Pilar, j.pilar, o.Pilar, 'umum'),\n  tema: pick(j.Tema, j.tema, o.Tema, ''),\n  format_visual: fmt,\n  jumlah_slide: jml,\n  sumber: j.Timestamp ? 'override_telegram' : 'dipanggil_langsung',\n  arahan_tambahan: pick(j.Instruksi, j.arahan, '') || '',\n  gambar_url: pick(j.Gambar, j.gambar_url, '') || '',\n  akun: pick(j.Akun, j.akun, o.Akun, '') || '',\n  revisi, caption_lama: capLama, gambar_lama: gamLama\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        784
+      ],
+      "id": "c083afe3-6ef1-4793-8131-44e577445d55",
+      "name": "Siapkan Konten - Override"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        64,
+        960
+      ],
+      "id": "a987d4c7-3aaf-4b0d-8d01-dce366bbdcca",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Kamu adalah ghostwriter yang nulis draft caption Threads untuk akun jasa ads bernama {{ $json.profil.handle }}. Audiensnya business owner yang butuh jasa iklan (TikTok Ads, Shopee Ads, Meta/CPAS).\n\nGaya tulisan wajib:\n- Ngobrol santai, kayak cerita pengalaman ke teman, bukan kayak artikel atau template\n- Jangan pakai numbered list (1. 2. 3.) atau bullet point kaku\n- Jangan pakai tanda hubung/strip berlebihan\n- Jangan buka kalimat dengan \"Pernahkah kamu...\" atau pembuka template AI lainnya\n- Boleh ada pertanyaan atau ajakan diskusi di akhir, tapi yang natural, bukan maksa\n- Panjang 2-3 paragraf pendek, pas buat dibaca santai di Threads\n- BATAS KERAS: total teks maksimal 450 karakter (termasuk spasi dan enter). Threads menolak teks di atas 500 karakter, jadi tulis ringkas dan padat, jangan melebihi batas ini\n\nAudiens: {{ $json.profil.audiens }}\n\nGaya tulisan akun:\n{{ $json.profil.gaya_copy }}\n\nAturan tambahan akun yang wajib diikuti:\n{{ $json.profil.aturan }}\n\nTema hari ini: {{ $json.tema }}\nPilar: {{ $json.pilar }}\n{{ $json.arahan_tambahan ? 'Catatan tambahan dari user: ' + $json.arahan_tambahan : '' }}\n\nTulis draft caption berdasarkan tema di atas. Balas HANYA dengan teks captionnya, tanpa embel-embel penjelasan atau tanda kutip di awal/akhir.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        528,
+        1616
+      ],
+      "id": "5474dfe5-33b9-461e-81d5-bf48d6fdb3be",
+      "name": "Generate Copywriting"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chat-latest",
+          "mode": "list",
+          "cachedResultName": "chat-latest"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        1616
+      ],
+      "id": "899f10d2-98b1-4b87-aa64-76cc219bbf57",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5.4-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Kamu adalah visual prompt engineer untuk carousel dan gambar Instagram/Threads sebuah akun jasa iklan digital. Tugasmu: dari tema, pilar, copy, dan GAYA VISUAL AKUN, buat satu image_prompt untuk setiap slide. Jumlah slide harus PERSIS sesuai jumlah_slide, tidak lebih dan tidak kurang.\n\nPERAN SLIDE (wajib):\n- Jika jumlah_slide = 1: satu slide bertipe \"cover\" berisi hook kuat dan inti pesan. Tanpa CTA, tanpa pil/tombol, tanpa penomoran. cta kosong.\n- Jika jumlah_slide >= 2:\n  - Slide 1 bertipe \"cover\": headline hook besar dan ilustrasi utama, tanpa penjelasan panjang, tanpa penomoran. cta = CTA COVER dari profil akun.\n  - Slide 2 sampai n-1 bertipe \"isi\": judul pendek dan penjelasan ringkas di kartu, penomoran kecil \"n/total\" di kanan atas. cta WAJIB kosong dan TIDAK ADA tombol/pil apa pun.\n  - Slide n (terakhir) bertipe \"penutup\": penjelasan atau kesimpulan ringkas, penomoran \"n/total\". cta = CTA PENUTUP dari profil akun.\n\nLOGO: logo akun dipasang terpisah setelah gambar jadi. Jangan menggambar logo, nama brand, atau wordmark di area kiri atas; sisakan area polos sekitar 380x130 piksel di pojok kiri atas (hanya background). Jangan menulis nama brand atau akun lain kecuali handle di footer.\n\nKONSISTENSI: semua slide memakai struktur visual, palet, tipografi, dan posisi elemen yang sama; hanya teks dan ilustrasi yang berbeda. Teks yang tampil harus persis sama dengan field headline, subtext, dan cta, dengan ejaan Indonesia benar.\n\nFORMAT OUTPUT: JSON array saja, tanpa teks lain:\n[{\"slide_number\":1,\"slide_type\":\"cover\",\"headline\":\"...\",\"subtext\":\"...\",\"cta\":\"teks CTA atau string kosong\",\"image_prompt\":\"deskripsi visual lengkap: salin GAYA VISUAL AKUN kata per kata, lalu isi spesifik slide (headline, subtext, ilustrasi unik, elemen CTA hanya jika cta tidak kosong, area kiri atas kosong)\"}]"
+            },
+            {
+              "content": "=Tema: {{ $('Merge').first().json.tema }}\nPilar: {{ $('Merge').first().json.pilar }}\nJumlah slide: {{ $('Merge').first().json.jumlah_slide }}\nFormat visual: {{ $('Merge').first().json.format_visual }}\n\nDraft copywriting sebagai referensi konten (ambil poin-poin pentingnya untuk dipecah jadi slide):\n{{ $json.text }}\n\nGAYA VISUAL AKUN (salin ke setiap image_prompt):\n{{ $('Siapkan Profil').first().json.profil.gaya_visual }}\n\nCTA COVER: {{ $('Siapkan Profil').first().json.profil.cta_cover }}\nCTA PENUTUP: {{ $('Siapkan Profil').first().json.profil.cta_penutup }}\n\nAturan akun yang wajib dipatuhi:\n{{ $('Siapkan Profil').first().json.profil.aturan }}\n\nRasio gambar 4:5 (1024x1280) dengan margin aman 8% kiri-kanan, 6% atas-bawah, teks jangan terpotong. Jumlah slide PERSIS: {{ $('Merge').first().json.jumlah_slide }}\n\nBuatkan JSON array prompt image generation sesuai instruksi di system message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        2448
+      ],
+      "id": "b92ef163-3d54-4934-8d6a-566a7605eb3d",
+      "name": "Generate Image Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output[0].content[0].text;\nconst slides = JSON.parse(raw);\n\nreturn slides.map(slide => ({\n  json: {\n    ...slide,\n    total_slides: slides.length\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        2448
+      ],
+      "id": "2be1c399-d6ab-4f02-8f8d-bc87bb364ec1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-image-2",
+          "mode": "list",
+          "cachedResultName": "GPT-IMAGE-2"
+        },
+        "prompt": "={{ $json.image_prompt }} RASIO 4:5 (portrait 1024x1280). Semua teks, kartu, dan elemen penting HARUS berada di area aman: sisakan margin minimal 8% dari kiri/kanan dan 6% dari atas/bawah, jangan ada teks menyentuh atau terpotong di tepi.",
+        "options": {
+          "quality": "medium",
+          "size": "1024x1280"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        2448
+      ],
+      "id": "7694d983-7a7d-4e46-a93a-65630bcf4377",
+      "name": "Generate Slide 1",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "waitBetweenTries": 10000,
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fd6e913d-2cca-438d-aad2-4cf18e37b810",
+              "leftValue": "={{ $json.slide_number }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        2448
+      ],
+      "id": "35220683-a718-44b3-ad0f-49c8d338efcf",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const slide1Image = $('Generate Slide 1').first().binary;\n\nreturn $input.all()\n  .filter(item => item.json.slide_number && item.json.slide_number !== 1)\n  .map(item => ({\n    json: item.json,\n    binary: slide1Image\n  }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        2624
+      ],
+      "id": "f1cbceb8-f788-4320-a80c-586508a12386",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-image-2",
+          "mode": "list",
+          "cachedResultName": "GPT-IMAGE-2"
+        },
+        "prompt": "=Gunakan gambar referensi ini HANYA sebagai acuan GAYA VISUAL akun (background, palet, tipografi headline, gaya ilustrasi, handle di footer, margin dan skala elemen). JANGAN menyalin ilustrasi, karakter, pose, maupun tombol CTA dari referensi; buat komposisi baru yang relevan dengan slide ini.\n\nBuat slide {{ $json.slide_number }} dari {{ $json.total_slides }} bertipe '{{ $json.slide_type }}':\n- Headline: {{ $json.headline }}\n- Teks pendukung (di kartu rounded dengan outline tipis): {{ $json.subtext }}\n- Penomoran: pil kecil '{{ $json.slide_number }}/{{ $json.total_slides }}' di kanan atas\n- Ilustrasi 3D cartoon atau ikon outline bercahaya yang BARU dan spesifik untuk isi slide ini\n- Bagian bawah: {{ $json.cta ? 'tampilkan pil kuning berteks tebal \"' + $json.cta + '\"' : 'JANGAN ADA pil, tombol, atau CTA apa pun. Hapus pil atau tombol yang ada di referensi.' }}\n\nArea kiri atas (sekitar 380x130 piksel) WAJIB polos tanpa logo, tanpa nama brand, tanpa teks, karena logo dipasang terpisah. Semua teks harus persis seperti di atas dengan ejaan Indonesia benar. Jangan menambah brand lain, watermark, tanggal, atau elemen yang tidak diminta. Pertahankan ukuran kanvas dan struktur layout identik dengan referensi. RASIO 4:5 (portrait 1024x1280). Semua teks, kartu, dan elemen penting HARUS berada di area aman: sisakan margin minimal 8% dari kiri/kanan dan 6% dari atas/bawah, jangan ada teks menyentuh atau terpotong di tepi.",
+        "images": {
+          "values": [
+            {}
+          ]
+        },
+        "size": "=1024x1536",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        2624
+      ],
+      "id": "4b1f0b8c-1b3c-48ae-820c-00cafd765889",
+      "name": "Edit image",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "waitBetweenTries": 10000,
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        528,
+        2624
+      ],
+      "id": "cb539527-6ee1-4daa-9a65-48f7c8b24ede",
+      "name": "Gabungkan Semua Slide"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "slide_number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        64,
+        3440
+      ],
+      "id": "9eb8260c-a605-4151-b223-10817f81d1fb",
+      "name": "Urutkan Slide"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\nreturn [{\n  json: {\n    ...item.json,\n    slide_number: 1\n  },\n  binary: item.binary\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        2448
+      ],
+      "id": "d7a83128-1f12-46ea-adb3-a608574e7834",
+      "name": "Set Slide Number - Cover"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            },
+            {
+              "field": "cronExpression",
+              "expression": "0 16 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        112
+      ],
+      "id": "7454f200-b2fa-4e67-8b5d-2cda081cda56",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "let items;\ntry { items = $('Urutkan Slide').all(); } catch (e) { items = []; }\nif (!items.length) items = $('Download Gambar Lama').all();\nconst maxSlots = 10;\nconst binaryData = {};\nconst mediaArray = [];\n\nconst caption = $('Caption Final').first().json.text;\n\nfor (let i = 0; i < maxSlots; i++) {\n  const sourceIndex = i < items.length ? i : items.length - 1;\n  binaryData[`slide${i}`] = items[sourceIndex].binary.data;\n}\n\nitems.forEach((item, index) => {\n  const mediaItem = { type: 'photo', media: `attach://slide${index}` };\n  if (index === 0) {\n    mediaItem.caption = caption;\n  }\n  mediaArray.push(mediaItem);\n});\n\nreturn [{\n  json: {\n    chatId: (() => { try { return $('Send a text message').first().json.result.chat.id; } catch (e) { return $('Dipanggil dari Handle Approval').first().json.chat_id; } })(),\n    media: JSON.stringify(mediaArray)\n  },\n  binary: binaryData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        3440
+      ],
+      "id": "57dd3bf1-1583-4d16-a152-a6e9d4f62daa",
+      "name": "Siapkan Data Carousel"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8906712115:AAHmWYPoTNPDWVuca6l_M3zVSXDu48TOx1E/sendMediaGroup",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "chat_id",
+              "value": "={{ $json.chatId }}"
+            },
+            {
+              "name": "media",
+              "value": "={{ $json.media }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide0",
+              "inputDataFieldName": "slide0"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide1",
+              "inputDataFieldName": "slide1"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide2",
+              "inputDataFieldName": "slide2"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide3",
+              "inputDataFieldName": "slide3"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide4",
+              "inputDataFieldName": "slide4"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide5",
+              "inputDataFieldName": "slide5"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide6",
+              "inputDataFieldName": "slide6"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide7",
+              "inputDataFieldName": "slide7"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide8",
+              "inputDataFieldName": "slide8"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "slide9",
+              "inputDataFieldName": "slide9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        752,
+        3440
+      ],
+      "id": "c71bc592-4e53-4f1f-a870-5562da451486",
+      "name": "Kirim Preview Carousel"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tanggal": "={{ $('Merge').first().json.tanggal }}",
+            "Slot": "={{ $('Merge').first().json.slot }}",
+            "Tema": "={{ $('Merge').first().json.tema }}",
+            "Caption IG": "={{ $('Caption Final').first().json.text }}",
+            "Status": "=menunggu approval",
+            "Catatan Override": "={{ $('Merge').first().json.arahan_tambahan || '' }}",
+            "Teks Threads": "={{ $('Caption Final').first().json.text }}",
+            "Message ID": "={{ $json.result.message_id }}",
+            "Image URL": "={{ (() => { let u = ''; try { u = $('Upload file').all().map(i => 'https://drive.google.com/uc?export=download&id=' + i.json.id).join(','); } catch (e) {} return u || $('Merge').first().json.gambar_lama || ''; })() }}"
+          },
+          "matchingColumns": [
+            "Tanggal"
+          ],
+          "schema": [
+            {
+              "id": "Tanggal",
+              "displayName": "Tanggal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Slot",
+              "displayName": "Slot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Teks Threads",
+              "displayName": "Teks Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caption IG",
+              "displayName": "Caption IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Post Threads",
+              "displayName": "Link Post Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link Post IG",
+              "displayName": "Link Post IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Catatan Override",
+              "displayName": "Catatan Override",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message ID",
+              "displayName": "Message ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Image URL",
+              "displayName": "Image URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        3616
+      ],
+      "id": "b6a5132b-f2f5-4b47-918a-7e8091a48411",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.result[0].chat.id }}",
+        "text": "Konten siap diapprove. Pilih aksi:",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Approve",
+                    "additionalFields": {
+                      "callback_data": "approve"
+                    }
+                  },
+                  {
+                    "text": "✏️ Revisi",
+                    "additionalFields": {
+                      "callback_data": "revise"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        3440
+      ],
+      "id": "ff594d99-9d2a-46c9-931d-0bf7115f1ffd",
+      "name": "Send a text message1",
+      "webhookId": "a031fa5a-9441-4b10-a487-2862580ccf58",
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Merge').first().json.tema }} - Slide {{ $itemIndex + 1 }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1V0XkmGwaAqKYz-AHOaQUVl3CVJNSl_Tu",
+          "mode": "list",
+          "cachedResultName": "Konten AI - Bank Konten",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1V0XkmGwaAqKYz-AHOaQUVl3CVJNSl_Tu"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        304,
+        3440
+      ],
+      "id": "2cc5283d-fb4d-4412-ae2a-1d21c678a795",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NoHOX8ECTX53Owf3",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const all = $input.all().map(i => i.json);\nconst st = r => String(r.Status || '').trim().toLowerCase();\nconst news = all.filter(r => st(r) === 'new');\nconst wait = all.filter(r => st(r) === 'menunggu');\nif (!news.length) return [{ json: { Status: 'none', plan_ts: wait.length ? wait[wait.length - 1].Timestamp : '' } }];\nreturn [{ json: news[news.length - 1] }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        464
+      ],
+      "id": "7722b932-f71c-4a9d-a583-25e03e8c3cbc",
+      "name": "Pilih Override"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.Timestamp }}",
+            "Status": "used"
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        784
+      ],
+      "id": "c55cec6e-40fc-4883-86f5-d78696c7d1e6",
+      "name": "Tandai Override Terpakai",
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        112
+      ],
+      "id": "cc4501dd-f34e-4c4e-8c64-0d90a041ab2c",
+      "name": "Dipanggil dari Handle Approval"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ 'T' + $now.toMillis() }}",
+            "Status": "menunggu",
+            "ResumeUrl": "={{ $execution.resumeUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ResumeUrl",
+              "displayName": "ResumeUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        288
+      ],
+      "id": "a2ebee6a-6477-4bce-96f2-dc8e4df30dd9",
+      "name": "Mulai Menunggu",
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=2"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.plan_ts }}",
+            "Status": "selesai"
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        784
+      ],
+      "id": "27f6ed32-00e6-4fe4-be3b-c31defb3b12d",
+      "name": "Tutup Menunggu",
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6548d057-47bf-4447-93f9-1570fca76c8a",
+              "leftValue": "={{ $json.revisi }}",
+              "rightValue": "visual",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        1616
+      ],
+      "id": "b8472a54-6426-4f07-9788-d63227230672",
+      "name": "Visual saja?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: $json.caption_lama } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        1616
+      ],
+      "id": "08c63365-0a63-4db0-b06f-2336f0d76fb7",
+      "name": "Pakai Caption Lama"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { text: $json.text } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        1616
+      ],
+      "id": "a0698b50-ea99-4783-b56c-6ebb80662379",
+      "name": "Caption Final"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d7d1b7d3-82ab-4548-b2f0-b7eeaad7e441",
+              "leftValue": "={{ $('Merge').first().json.revisi }}",
+              "rightValue": "copy",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        1792
+      ],
+      "id": "58a00168-2175-4924-a161-1541f902f39b",
+      "name": "Copy saja?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urls = String($('Merge').first().json.gambar_lama || '').split(',').map(s => s.trim()).filter(Boolean);\nreturn urls.map((u, i) => ({ json: { url: u, index: i } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        3120
+      ],
+      "id": "7232ed3d-007d-41a3-85e8-c9b075115dce",
+      "name": "Ambil Gambar Lama"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        3120
+      ],
+      "id": "4b62a7d8-dfb2-4f58-a91e-c0ba598753b8",
+      "name": "Download Gambar Lama"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 3,
+          "mode": "list",
+          "cachedResultName": "Profil Akun"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        1280
+      ],
+      "id": "ebe49004-0efb-41cc-8146-ce78ea28e608",
+      "name": "Ambil Profil",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 4,
+          "mode": "list",
+          "cachedResultName": "Aturan Belajar"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        1280
+      ],
+      "id": "70e6fea6-51a4-41d5-928d-d9ab75941628",
+      "name": "Ambil Aturan",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('Merge').first().json;\nconst profs = $('Ambil Profil').all().map(i => i.json).filter(r => r.Akun);\nconst want = String(base.akun || '').trim();\nconst p = profs.find(r => want && r.Akun === want) || profs.find(r => String(r.Aktif || '').toLowerCase() === 'ya') || profs[0] || {};\nconst rules = $input.all().map(i => i.json).filter(r => r.Aturan && (!r.Akun || r.Akun === p.Akun || r.Akun === '*')).map(r => '- ' + r.Aturan);\nreturn [{ json: { ...base, profil: {\n  akun: p.Akun || '', handle: p.Handle || '', nama: p['Nama Brand'] || '', audiens: p.Audiens || '',\n  gaya_copy: p['Gaya Copy'] || '', gaya_visual: p['Gaya Visual'] || '',\n  cta_cover: p['CTA Cover'] || '', cta_penutup: p['CTA Penutup'] || '',\n  logo_id: p['Logo File ID'] || '', aturan: rules.join('\\n')\n} } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        1280
+      ],
+      "id": "6da8c0b8-8eca-41a7-a9a9-88034d2d8026",
+      "name": "Siapkan Profil"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Siapkan Profil').first().json.profil.logo_id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        752,
+        2624
+      ],
+      "id": "465eb7b5-9038-4d23-b284-0d6d05acda12",
+      "name": "Ambil Logo",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NoHOX8ECTX53Owf3",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const slides = $('Gabungkan Semua Slide').all();\nconst first = $input.first();\nconst logo = first && first.binary && first.binary.data;\nif (!logo) return slides;\nreturn slides.map(it => ({ json: it.json, binary: { data: it.binary.data, logo } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        2624
+      ],
+      "id": "2df6f800-2db1-4eeb-877a-ac4c5f8190d0",
+      "name": "Pasang Logo ke Slide"
+    },
+    {
+      "parameters": {
+        "operation": "composite",
+        "dataPropertyNameComposite": "logo",
+        "positionX": 40,
+        "positionY": 36,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        64,
+        2784
+      ],
+      "id": "7ebeef8b-7291-4027-8e21-52ec2fb32fe2",
+      "name": "Tempel Logo",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chat-latest",
+          "mode": "list",
+          "cachedResultName": "CHAT-LATEST"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Kamu adalah content strategist sekaligus penyusun carousel Instagram untuk akun jasa iklan (Meta Ads, TikTok Ads, Shopee Ads) yang melayani brand owner e-commerce di Indonesia. Dari tema dan draft copy yang diberikan, susun isi tiap slide dalam bentuk JSON terstruktur. Slide dirender otomatis ke template desain tetap (logo, warna, font sudah diurus sistem), jadi kamu HANYA menulis teks, bukan deskripsi gambar.\n\nTARGET AUDIENS: brand owner dan pemilik toko online di Indonesia yang sudah jualan tapi kewalahan atau kecewa urus iklan sendiri atau lewat agency/freelancer sebelumnya. Pain point: budget keluar tapi hasil tidak jelas, laporan cuma \"aman\", tidak ngerti iklannya ngapain aja.\nTUJUAN: bikin brand owner merasa dimengerti, paham cara kerja iklan yang sehat, dan terdorong ngobrol dengan akun. Edukasi dulu, jualan terakhir.\n\nGAYA BAHASA: Indonesia santai gaya Jaksel ringan, sapaan \"kamu\" dan \"kita\" (bukan lo/gue). Boleh campur istilah Inggris umum (red flag, proven, review, report, scale, no commitment). Kalimat pendek, 1 pesan per slide. DILARANG pakai em dash atau en dash. DILARANG emoji. Jujur dan seimbang: akui keluhan brand owner valid, jelaskan sisi agency terbuka, sebut batasannya (iklan bukan sulap). Jangan mengarang statistik, angka hasil klien, atau testimoni; kalau butuh angka tandai sebagai contoh. Kalau topik berasal dari keluhan orang di media sosial, jangan sebut platform atau akun, parafrasekan jadi \"kekhawatiran yang sering dirasain brand owner\". Jangan menyerang individu, agency, atau kompetitor; empati dulu, edukasi kemudian.\n\nLAYOUT YANG TERSEDIA (pilih per slide, field yang tidak dipakai dikosongkan):\n- \"hook\": untuk slide 1. Field: headline (maks 95 karakter, 1 kalimat besar), subtitle (kalimat pendukung, serif italic emas, maks 90 karakter).\n- \"quote\": kutipan keluhan yang sudah diparafrasekan. Field: label (huruf kapital kecil di atas), quote (maks 150 karakter), headline (maks 30 karakter, validasi singkat), body (maks 110 karakter), footer (kalimat penutup italic, maks 90 karakter).\n- \"numbered\": penjelasan konsep maksimal 3 poin. Field: label, headline (maks 70 karakter), body (opsional pengantar, maks 100 karakter), items (2 sampai 3 string, tiap maks 60 karakter), footer, footer_gold (true jika footer perlu emas).\n- \"checklist\": daftar 4 poin. Field: label, headline, items (4 string, tiap maks 55 karakter), closing (maks 80 karakter), footer (maks 140 karakter).\n- \"compare\": perbandingan dua kolom. Field: label, headline (maks 60 karakter), left {title, items[4]}, right {title, items[4]}; tiap item maks 40 karakter.\n- \"timeline\": contoh alur. Field: label, headline, rows (3 sampai 4 objek {tag (maks 10 karakter, mis. \"Hari 1-3\"), text (maks 95 karakter)}; baris terakhir boleh punya \"outline\": true), footer (tandai bahwa ini contoh).\n- \"cta\": slide terakhir, WAJIB. Field: headline (merangkum pesan carousel, maks 60 karakter), cta_title KOSONG (string kosong, jangan tulis ajakan komen atau kata kunci apa pun), body (satu kalimat pendek maks 80 karakter berupa ajakan diskusi yang natural dan tidak memaksa, misalnya ajak audiens cerita pengalamannya atau ngobrol bareng akun). JANGAN pakai kata \"komen\", \"Link in Bio\", atau ajakan DM di slide ini. Footer otomatis \"More Scale, More Wise.\".\nMarkup teks: ==kata== untuk sorotan emas (pakai di 1 sampai 3 kata kunci per headline), **kata** untuk tebal.\n\nATURAN SLIDE 1: subtitle tidak boleh memuat kata \"geser\" atau ajakan CTA apa pun; sistem sudah menambahkan tanda Geser sendiri di bawah.\n\nATURAN STRUKTUR: jumlah slide PERSIS sama dengan jumlah_slide yang diminta. Slide pertama selalu layout \"hook\", slide terakhir selalu layout \"cta\". Jika jumlah_slide 1: hanya satu slide \"hook\". Jika 2: hook lalu cta. Slide tengah memilih layout yang cocok dan sebaiknya bervariasi (jangan semua sama). Contoh urutan 7 slide: hook, quote, numbered, compare, timeline, checklist, cta. Urutan cerita: hook, empati, penjelasan, perbandingan/contoh, hak/langkah, cta. Satu pesan per slide, teks harus muat dan ringkas.\n\nATURAN AKUN (dari profil dan aturan belajar) wajib dipatuhi.\n\nFORMAT OUTPUT: JSON object saja tanpa teks lain: {\"slides\":[{\"layout\":\"hook\",\"headline\":\"...\",\"subtitle\":\"...\"}, ...]}"
+            },
+            {
+              "content": "=Tema: {{ $('Merge').first().json.tema }}\nPilar: {{ $('Merge').first().json.pilar }}\nJumlah slide: {{ $('Merge').first().json.jumlah_slide }}\n\nDraft copywriting sebagai referensi konten (ambil poin penting untuk dipecah jadi slide):\n{{ $json.text }}\n\nGaya copy akun: {{ $('Siapkan Profil').first().json.profil.gaya_copy }}\nAudiens: {{ $('Siapkan Profil').first().json.profil.audiens }}\n\nAturan akun yang wajib dipatuhi:\n{{ $('Siapkan Profil').first().json.profil.aturan }}\n\nArahan khusus (jika ada): {{ $('Merge').first().json.arahan_tambahan || '' }}\n\nJumlah slide PERSIS: {{ $('Merge').first().json.jumlah_slide }}. Buat JSON slides sesuai instruksi di system message."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        2112
+      ],
+      "id": "b2000000-0001-4000-8000-000000000001",
+      "name": "Susun Slide Kartu",
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "mk1",
+              "leftValue": "={{ /gambar ai|pakai ai|image ai|ai image|mode ilustrasi|versi ilustrasi|pakai ilustrasi|ilustrasi ai/i.test(String($('Merge').first().json.arahan_tambahan || '') + ' ' + String($('Merge').first().json.mode_visual || '')) }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        2112
+      ],
+      "id": "b2000000-0002-4000-8000-000000000002",
+      "name": "Mode Kartu?"
+    },
+    {
+      "parameters": {
+        "jsCode": "let t = String($input.first().json.output[0].content[0].text || '').trim();\nt = t.replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();\nconst obj = JSON.parse(t);\nlet slides = Array.isArray(obj) ? obj : (obj.slides || []);\nconst want = Number($('Merge').first().json.jumlah_slide) || slides.length;\nconst clean = (v) => typeof v === 'string' ? v.replace(/[—–]/g, ',') : Array.isArray(v) ? v.map(clean) : (v && typeof v === 'object') ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, clean(x)])) : v;\nslides = slides.slice(0, want).map(clean);\nif (slides.length) { slides[0].layout = 'hook'; if (slides.length > 1) slides[slides.length - 1].layout = 'cta'; }\nif (slides.length > 1) { slides[slides.length - 1].cta_title = ''; }\nslides.forEach((x) => { if (x.layout === 'hook' && x.subtitle) x.subtitle = String(x.subtitle).replace(/\\s*geser[^.!?]*[.!?]?/ig, '').trim(); });\nconst total = slides.length;\nreturn slides.map((s, i) => ({ json: { slide_number: i + 1, total_slides: total, n: i + 1, total, slide: s } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        2112
+      ],
+      "id": "b2000000-0003-4000-8000-000000000003",
+      "name": "Parse Slide Kartu"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://renderer:3000/render",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ slide: $json.slide, n: $json.n, total: $json.total }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          },
+          "timeout": 90000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        2112
+      ],
+      "id": "b2000000-0004-4000-8000-000000000004",
+      "name": "Render Slide"
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('Parse Slide Kartu').all();\nreturn $input.all().map((it, i) => {\n  const b = it.binary && it.binary.data ? it.binary.data : null;\n  if (b) { b.fileName = 'slide-' + src[i].json.slide_number + '.png'; b.mimeType = 'image/png'; }\n  return { json: { ...src[i].json }, binary: it.binary };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        2112
+      ],
+      "id": "b2000000-0005-4000-8000-000000000005",
+      "name": "Tandai Nomor Slide"
+    },
+    {
+      "parameters": {
+        "content": "## 1. Pemicu dan Rencana Konten (Telegram + masa tunggu)",
+        "height": 610,
+        "width": 1210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "41822dbc-3e78-4239-95c1-64f422386074",
+      "name": "Blok 1"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Pilih Sumber Konten (kalender atau arahan kamu)",
+        "height": 440,
+        "width": 1210,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        672
+      ],
+      "id": "c94a470e-c7ad-4c88-bdfa-2320b5dd3d96",
+      "name": "Blok 2"
+    },
+    {
+      "parameters": {
+        "content": "## 3. Profil Akun dan Aturan Belajar",
+        "height": 270,
+        "width": 750,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1184
+      ],
+      "id": "112b9b82-95a5-414d-98b8-1b7fbff5edf5",
+      "name": "Blok 3"
+    },
+    {
+      "parameters": {
+        "content": "## 4. Copywriting dan Caption",
+        "height": 440,
+        "width": 1210,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1504
+      ],
+      "id": "826053dd-7a0a-4826-b687-438ee7daf8b9",
+      "name": "Blok 4"
+    },
+    {
+      "parameters": {
+        "content": "## 5A. Slide Mode KARTU (renderer, default)",
+        "height": 270,
+        "width": 1210,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2000
+      ],
+      "id": "d32ecdbf-2ea6-4868-954d-8a2c17db51e7",
+      "name": "Blok 5"
+    },
+    {
+      "parameters": {
+        "content": "## 5B. Slide Mode ILUSTRASI (AI gambar, opsional)",
+        "height": 610,
+        "width": 1210,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2336
+      ],
+      "id": "f62a7877-56a8-4a3f-a71a-c9786a7c93d6",
+      "name": "Blok 6"
+    },
+    {
+      "parameters": {
+        "content": "## 5C. Revisi Teks Saja (pakai gambar lama)",
+        "height": 270,
+        "width": 520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        3008
+      ],
+      "id": "9f612b40-8d11-48ce-a689-d15f613848c3",
+      "name": "Blok 7"
+    },
+    {
+      "parameters": {
+        "content": "## 6. Upload Drive, Preview Telegram, Catat ke Sheet",
+        "height": 440,
+        "width": 1210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        3344
+      ],
+      "id": "d3d7c6b9-0394-4229-9f97-89fce495c0aa",
+      "name": "Blok 8"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter Tema Hari Ini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Mulai Menunggu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Pilih Override",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Tema Hari Ini": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Konten - Override",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Tandai Override Terpakai",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Siapkan Konten - Default",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Tutup Menunggu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Konten - Default": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Konten - Override": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Ambil Profil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Copywriting": {
+      "main": [
+        [
+          {
+            "node": "Caption Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Copywriting",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Generate Slide 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Slide 1": {
+      "main": [
+        [
+          {
+            "node": "Set Slide Number - Cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit image": {
+      "main": [
+        [
+          {
+            "node": "Gabungkan Semua Slide",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gabungkan Semua Slide": {
+      "main": [
+        [
+          {
+            "node": "Ambil Logo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Urutkan Slide": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Slide Number - Cover": {
+      "main": [
+        [
+          {
+            "node": "Gabungkan Semua Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Data Carousel": {
+      "main": [
+        [
+          {
+            "node": "Kirim Preview Carousel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kirim Preview Carousel": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Data Carousel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pilih Override": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dipanggil dari Handle Approval": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Konten - Override",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mulai Menunggu": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visual saja?": {
+      "main": [
+        [
+          {
+            "node": "Pakai Caption Lama",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Copywriting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pakai Caption Lama": {
+      "main": [
+        [
+          {
+            "node": "Caption Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption Final": {
+      "main": [
+        [
+          {
+            "node": "Copy saja?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy saja?": {
+      "main": [
+        [
+          {
+            "node": "Ambil Gambar Lama",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mode Kartu?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Gambar Lama": {
+      "main": [
+        [
+          {
+            "node": "Download Gambar Lama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Gambar Lama": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Data Carousel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Profil": {
+      "main": [
+        [
+          {
+            "node": "Ambil Aturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Aturan": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Profil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Profil": {
+      "main": [
+        [
+          {
+            "node": "Visual saja?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Logo": {
+      "main": [
+        [
+          {
+            "node": "Pasang Logo ke Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pasang Logo ke Slide": {
+      "main": [
+        [
+          {
+            "node": "Tempel Logo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tempel Logo": {
+      "main": [
+        [
+          {
+            "node": "Urutkan Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode Kartu?": {
+      "main": [
+        [
+          {
+            "node": "Susun Slide Kartu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Image Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Susun Slide Kartu": {
+      "main": [
+        [
+          {
+            "node": "Parse Slide Kartu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Slide Kartu": {
+      "main": [
+        [
+          {
+            "node": "Render Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Slide": {
+      "main": [
+        [
+          {
+            "node": "Tandai Nomor Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tandai Nomor Slide": {
+      "main": [
+        [
+          {
+            "node": "Urutkan Slide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "bdca58b9-eb19-4300-a1c5-9c95ef83e1ff",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "6188fc89056339638d52cd423afee0238da6de1584cbd1586ac9f7610a15333e"
+  },
+  "nodeGroups": [],
+  "id": "0DTvyCMg7usfskeK",
+  "tags": []
+}

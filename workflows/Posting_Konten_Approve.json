@@ -1,0 +1,837 @@
+{
+  "name": "Posting Konten Approve",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c7eee8f7-d519-4a5d-951a-23bc3a05161b",
+      "name": "Dipanggil dari Agent",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Message ID",
+              "lookupValue": "={{ $json.message_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2dd341ac-667a-447d-87c3-29413e3c6dea",
+      "name": "Ambil Baris Konten",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        96
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.threads.net/v1.0/me/threads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "TEXT"
+            },
+            {
+              "name": "text",
+              "value": "={{ (() => { const t = String($('Ambil Baris Konten').first().json['Teks Threads'] || ''); if (t.length <= 500) return t; const cut = t.slice(0, 500); const i = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '), cut.lastIndexOf('\\n')); return i > 200 ? cut.slice(0, i + 1) : cut.slice(0, 497) + '...'; })() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47445f81-7114-4fb2-bf9e-7466ba0afa91",
+      "name": "Threads - Create Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        96
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "20e4a471-39aa-4ec2-9715-573700da0a2f",
+      "name": "Wait Threads",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        96
+      ],
+      "webhookId": "6cf18e0c-a42b-4a79-8450-13fee0ed6945"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.threads.net/v1.0/me/threads_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $('Threads - Create Container').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44931334-321e-487f-8052-b9595fffcc91",
+      "name": "Threads - Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        96
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.threads.net/v1.0/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "permalink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ee11419b-0dfa-4c40-8a2e-e6f336c2ceec",
+      "name": "Threads - Get Permalink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        96
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $('Ambil Baris Konten').first().json;\nconst urls = String(row['Image URL'] || '').split(',').map(s => s.trim()).filter(Boolean);\nif (!urls.length) throw new Error('Kolom Image URL kosong untuk baris ini');\nreturn urls.map((u, i) => ({ json: { image_url: u, index: i, total: urls.length } }));"
+      },
+      "id": "785257ca-686a-461a-ac1c-9dc40c3ee5ec",
+      "name": "IG - Parse Slides",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a0e103ac-9bb0-43dd-802a-58c09a1e9c16",
+      "name": "IG - Carousel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1568,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "is_carousel_item",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ad307fd9-0b7c-4f44-b422-50a9c59f75a7",
+      "name": "IG - Create Slide Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = items.map(i => i.json.id).filter(Boolean);\nif (!ids.length) throw new Error('Tidak ada child container yang terbuat');\nreturn [{ json: { children: ids.join(',') } }];"
+      },
+      "id": "42864963-f5eb-4b90-af92-ed0513eab08a",
+      "name": "IG - Collect Children",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "1d11dec2-4487-4c80-ad21-b93afa8feacb",
+      "name": "Wait IG Slides",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2240,
+        0
+      ],
+      "webhookId": "9f00924b-41dc-46c4-8435-5df179d129ec"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "CAROUSEL"
+            },
+            {
+              "name": "children",
+              "value": "={{ $json.children }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Ambil Baris Konten').first().json['Caption IG'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c66aa5ca-de7b-45c2-afa6-bec3aa2336c3",
+      "name": "IG - Create Carousel Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "id": "0c4d8ddb-fa07-4681-8ed5-41421485359c",
+      "name": "Wait IG",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2688,
+        0
+      ],
+      "webhookId": "bbc3741d-fd3c-42f1-af1f-172bda482edb"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6497476c-d846-4909-b63c-f9cc99b3b178",
+      "name": "IG - Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2912,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.instagram.com/v21.0/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "permalink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9c475070-a53a-41b7-86b0-833a6622530a",
+      "name": "IG - Get Permalink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3136,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ID": "={{ $('Ambil Baris Konten').first().json['Message ID'] }}",
+            "Status": "terposting",
+            "Link Post Threads": "={{ $('Threads - Get Permalink').first().json.permalink }}",
+            "Link Post IG": "={{ $json.permalink }}"
+          },
+          "matchingColumns": [
+            "Message ID"
+          ]
+        },
+        "options": {}
+      },
+      "id": "a2bb0cdc-1603-4fc6-84bd-44d3fadaf1b7",
+      "name": "Update Status Terposting",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3360,
+        0
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Ambil Baris Konten').first().json['Caption IG'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fffee067-ba63-41b3-9f34-26bd214b3cb3",
+      "name": "IG - Create Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        192
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "id": "a2d967bc-eb97-4e4c-8254-5ea4ab9db506",
+      "name": "Wait IG Single",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        192
+      ],
+      "webhookId": "1441e42d-29f3-4a64-a01f-7722ada0e066"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7338d1aa-e744-4ad1-a859-d5a9ca596072",
+      "name": "IG - Publish Single",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        192
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.instagram.com/v21.0/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "permalink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4a7ec556-4897-4568-a0ca-068c02aa9990",
+      "name": "IG - Get Permalink Single",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        192
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ID": "={{ $('Ambil Baris Konten').first().json['Message ID'] }}",
+            "Status": "terposting",
+            "Link Post Threads": "={{ $('Threads - Get Permalink').first().json.permalink }}",
+            "Link Post IG": "={{ $json.permalink }}"
+          },
+          "matchingColumns": [
+            "Message ID"
+          ]
+        },
+        "options": {}
+      },
+      "id": "1fc81561-13e5-48ea-8eac-511480dd0678",
+      "name": "Update Status Terposting Single",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2688,
+        192
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Dipanggil dari Agent": {
+      "main": [
+        [
+          {
+            "node": "Ambil Baris Konten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Baris Konten": {
+      "main": [
+        [
+          {
+            "node": "Threads - Create Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Create Container": {
+      "main": [
+        [
+          {
+            "node": "Wait Threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Threads": {
+      "main": [
+        [
+          {
+            "node": "Threads - Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Publish": {
+      "main": [
+        [
+          {
+            "node": "Threads - Get Permalink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Get Permalink": {
+      "main": [
+        [
+          {
+            "node": "IG - Parse Slides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Parse Slides": {
+      "main": [
+        [
+          {
+            "node": "IG - Carousel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Carousel?": {
+      "main": [
+        [
+          {
+            "node": "IG - Create Slide Container",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IG - Create Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Slide Container": {
+      "main": [
+        [
+          {
+            "node": "IG - Collect Children",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Collect Children": {
+      "main": [
+        [
+          {
+            "node": "Wait IG Slides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait IG Slides": {
+      "main": [
+        [
+          {
+            "node": "IG - Create Carousel Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Carousel Container": {
+      "main": [
+        [
+          {
+            "node": "Wait IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait IG": {
+      "main": [
+        [
+          {
+            "node": "IG - Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Publish": {
+      "main": [
+        [
+          {
+            "node": "IG - Get Permalink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Get Permalink": {
+      "main": [
+        [
+          {
+            "node": "Update Status Terposting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Container": {
+      "main": [
+        [
+          {
+            "node": "Wait IG Single",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait IG Single": {
+      "main": [
+        [
+          {
+            "node": "IG - Publish Single",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Publish Single": {
+      "main": [
+        [
+          {
+            "node": "IG - Get Permalink Single",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Get Permalink Single": {
+      "main": [
+        [
+          {
+            "node": "Update Status Terposting Single",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "9b88cbc1-3b3c-4e6b-832f-22a0054596bf",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "6188fc89056339638d52cd423afee0238da6de1584cbd1586ac9f7610a15333e"
+  },
+  "nodeGroups": [],
+  "id": "h2FNLSkQyJbn2cIB",
+  "tags": []
+}

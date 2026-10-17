@@ -1,0 +1,2335 @@
+{
+  "name": "Handle Approval",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "callback_query",
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        64,
+        112
+      ],
+      "id": "0709765f-8085-4651-a21f-1466aff99aa9",
+      "name": "Telegram Trigger",
+      "webhookId": "10e6cfc2-40ec-4929-b14a-c619ba3f8745",
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "queryId": "={{ $json.callback_query.id }}",
+        "additionalFields": {
+          "text": "Oke, diproses ya!"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        112
+      ],
+      "id": "3ae3b17c-6838-47d4-993c-2d7222a80c0a",
+      "name": "Answer Query a callback",
+      "webhookId": "9aec4dff-b32b-4512-82b1-2a3142746af6",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5b7893ef-e7a3-41b6-bab3-1540050ad089",
+              "leftValue": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        112
+      ],
+      "id": "34cbcb45-46c4-4c15-8b7a-6a34202feff9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=Message ID",
+              "lookupValue": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        624
+      ],
+      "id": "88b1c5e5-efad-4943-8301-d5c2ef66f68f",
+      "name": "Get row(s) in sheet",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.threads.net/v1.0/me/threads",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "TEXT"
+            },
+            {
+              "name": "text",
+              "value": "={{ (() => { const t = String($('Get row(s) in sheet').first().json['Teks Threads'] || ''); if (t.length <= 500) return t; const cut = t.slice(0, 500); const i = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '), cut.lastIndexOf('\\n')); return i > 200 ? cut.slice(0, i + 1) : cut.slice(0, 497) + '...'; })() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e9939fa7-c634-4648-9c32-9b4d5d89a6e7",
+      "name": "Threads - Create Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        624
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "911b6199-29ad-4a10-9634-2790f5a96816",
+      "name": "Wait Threads",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        624
+      ],
+      "webhookId": "6b56eff3-8bf2-41ef-9f49-3f878a7d9861"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.threads.net/v1.0/me/threads_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $('Threads - Create Container').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "823754e0-b4a6-49b1-819f-8cd5f2800767",
+      "name": "Threads - Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        624
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.threads.net/v1.0/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "permalink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ae8cb805-c2c0-4730-aa27-c619e2c1ce0f",
+      "name": "Threads - Get Permalink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        624
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u3hIYKEDkdQlYm81",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Get row(s) in sheet').first().json['Caption IG'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80c62d67-0870-49a3-907a-7344234658bf",
+      "name": "IG - Create Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        1120
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "id": "a10511d5-adfb-4579-a197-996f8eec59e4",
+      "name": "Wait IG",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        1120
+      ],
+      "webhookId": "ec9020ea-a167-416a-a0bb-6f4a37aff283"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "051cf1b8-f886-48d3-8f18-6649e0ceeefd",
+      "name": "IG - Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        1120
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.instagram.com/v21.0/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "permalink"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01ff8560-56b0-4bc9-9658-8eefd8c2b47a",
+      "name": "IG - Get Permalink",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        1120
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ID": "={{ $('Telegram Trigger').first().json.callback_query.message.message_id }}",
+            "Status": "terposting",
+            "Link Post Threads": "={{ $('Threads - Get Permalink').first().json.permalink }}",
+            "Link Post IG": "={{ $('IG - Get Permalink').first().json.permalink }}"
+          },
+          "matchingColumns": [
+            "Message ID"
+          ],
+          "schema": [
+            {
+              "id": "Message ID",
+              "displayName": "Message ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link Post Threads",
+              "displayName": "Link Post Threads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link Post IG",
+              "displayName": "Link Post IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01a76b44-d2b5-4a82-bbb6-1a928ab17c72",
+      "name": "Update Status Terposting",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        1440
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query.message.chat.id }}",
+        "text": "=✅ Terposting!\nThreads: {{ $('Threads - Get Permalink').first().json.permalink }}\nIG: {{ $('IG - Get Permalink').first().json.permalink }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "dadd5917-a4c6-4aba-acbd-037e8a8260af",
+      "name": "Telegram - Konfirmasi Posting",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        1440
+      ],
+      "webhookId": "b7bb9efc-5219-4c14-ab58-cba84336cdf4",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ID": "={{ $('Telegram Trigger').first().json.callback_query.message.message_id }}",
+            "Status": "menunggu arahan revisi"
+          },
+          "matchingColumns": [
+            "Message ID"
+          ],
+          "schema": [
+            {
+              "id": "Message ID",
+              "displayName": "Message ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d804927c-b72f-4f2c-a36f-8b3fc99403cc",
+      "name": "Update Status Revisi",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        1440
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query.message.chat.id }}",
+        "text": "✏️ Siap, mau diubah apa? Balas chat ini dengan arahanmu (boleh sertakan foto referensi).\n\nContoh: \"judulnya lebih nendang\", \"ganti tema ke ROAS Meta CPAS\", \"visual lebih simpel\".",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "bee7101c-8494-40bf-ae8a-97f166ded290",
+      "name": "Telegram - Konfirmasi Revisi",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        1440
+      ],
+      "webhookId": "d7ccabc3-dca1-4c4d-b013-171e521929e7",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $('Get row(s) in sheet').first().json;\nconst urls = String(row['Image URL'] || '').split(',').map(s => s.trim()).filter(Boolean);\nif (!urls.length) throw new Error('Kolom Image URL kosong untuk baris ini');\nreturn urls.map((u, i) => ({ json: { image_url: u, index: i, total: urls.length } }));"
+      },
+      "id": "b16f755f-d194-4f1b-b805-7d6584529d63",
+      "name": "IG - Parse Slides",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cbeb74f4-0a52-45b7-9c10-beef0a7179b0",
+              "leftValue": "={{ $json.total }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8cef4208-8c2e-4155-b955-4ca975de230f",
+      "name": "IG - Carousel?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "is_carousel_item",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "57bafc47-6619-4712-a630-cd89b3b81424",
+      "name": "IG - Create Slide Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        944
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = items.map(i => i.json.id).filter(Boolean);\nif (!ids.length) throw new Error('Tidak ada child container yang terbuat');\nreturn [{ json: { children: ids.join(',') } }];"
+      },
+      "id": "325dfe44-6392-44cc-86ae-9938c1817f54",
+      "name": "IG - Collect Children",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "0ef369c6-9c91-4dec-b289-72ac7a341acc",
+      "name": "Wait IG Slides",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        944
+      ],
+      "webhookId": "1b3afafa-23df-4cb3-a8ad-c945dc896cca"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.instagram.com/v21.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "CAROUSEL"
+            },
+            {
+              "name": "children",
+              "value": "={{ $json.children }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Get row(s) in sheet').first().json['Caption IG'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "854eee44-a82c-4d9a-acbb-89afc176706e",
+      "name": "IG - Create Carousel Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        1120
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "UivcYi2AmJkAjDYb",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "897d41a0-1ea8-497b-b74f-54a8138ca3a0",
+              "leftValue": "={{ !!$json.callback_query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        112
+      ],
+      "id": "6b6a1ecc-c49c-4938-96c8-21a205ae702a",
+      "name": "Callback?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const m = $json.message || {};\nconst ALLOWED_CHATS = new Set([5331390153, 231668649]);\nif (!m.chat || !ALLOWED_CHATS.has(m.chat.id) || (m.from && m.from.is_bot)) return [];\nconst photo = Array.isArray(m.photo) && m.photo.length ? m.photo[m.photo.length - 1].file_id : '';\nconst text = String(m.text || m.caption || '').trim();\nif (text.startsWith('/')) return [];\nif (!text && !photo) return [];\nconst rep = (m.reply_to_message && (m.reply_to_message.text || m.reply_to_message.caption)) || '';\nreturn [{ json: { chat_id: m.chat.id, text, photo_file_id: photo, has_photo: !!photo, is_plan_reply: rep.startsWith('📋 Rencana konten'), reply_to_text: rep.slice(0, 300) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        1776
+      ],
+      "id": "d809a467-be52-40be-aeca-e7eedf088bca",
+      "name": "Msg - Ekstrak"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "27898518-2b9c-432b-80e5-6a8e9c66bd9f",
+              "leftValue": "={{ $json.has_photo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        1776
+      ],
+      "id": "5f832c1b-2a38-4e57-a948-a7811319cb85",
+      "name": "Ada Foto?"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.photo_file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        1776
+      ],
+      "id": "f8b525a0-5255-4ad4-9e01-718ff943799a",
+      "name": "Telegram - Ambil Foto",
+      "webhookId": "82ad71a3-d308-4ba1-903e-2a3bf4484fd6",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "={{ 'ref-' + $now.toFormat('yyyyMMdd-HHmmss') }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1V0XkmGwaAqKYz-AHOaQUVl3CVJNSl_Tu",
+          "mode": "list",
+          "cachedResultName": "Konten AI - Bank Konten",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1V0XkmGwaAqKYz-AHOaQUVl3CVJNSl_Tu"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        752,
+        1776
+      ],
+      "id": "c1cdafc7-3cfb-4e2e-9956-a0a8aa0a6d5e",
+      "name": "Drive - Simpan Referensi",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "NoHOX8ECTX53Owf3",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        2112
+      ],
+      "id": "dc6bca01-e9e8-46f8-9d89-2717966ad36f",
+      "name": "Cari Revisi",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $('Msg - Ekstrak').first().json;\nconst logRows = $('Cari Revisi').all().map(i => i.json);\nconst revRows = logRows.filter(r => String(r.Status || '') === 'menunggu arahan revisi');\nconst today = $now.toFormat('yyyy-MM-dd');\nconst pendRows = logRows.filter(r => String(r.Status || '') === 'menunggu approval' && String(r.Tanggal || '') === today && r['Message ID']);\nconst rev = revRows.length ? revRows[revRows.length - 1] : (pendRows.length ? pendRows[pendRows.length - 1] : null);\nconst ovRows = $input.all().map(i => i.json).filter(r => ['menunggu', 'new'].includes(String(r.Status || '').trim().toLowerCase()) && /^T\\d+$/.test(String(r.Timestamp || '')) && Date.now() - Number(String(r.Timestamp).slice(1)) < 2 * 3600 * 1000);\nconst plan = ovRows.length ? ovRows[ovRows.length - 1] : null;\nlet ref = '';\ntry { ref = 'https://drive.google.com/uc?export=download&id=' + $('Drive - Simpan Referensi').first().json.id; } catch (x) {}\nconst mode = (e.is_plan_reply || plan) ? 'plan' : (rev ? 'revisi' : 'baru');\nconst urls = rev ? String(rev['Image URL'] || '').split(',').filter(Boolean) : [];\nconst ctx = rev ? { tema: rev.Tema, slot: rev.Slot, tanggal: rev.Tanggal, jumlah_slide: urls.length || 1, format_visual: urls.length > 1 ? 'carousel' : 'single', caption_sebelumnya: rev['Caption IG'] } : null;\nconst SYS = \"Kamu adalah \\\"otak\\\" asisten pembuat konten sosial media untuk akun jasa iklan digital (TikTok Ads, Shopee Ads, Meta CPAS) yang dikelola lewat Telegram. Tugasmu menafsirkan pesan user menjadi instruksi terstruktur untuk pipeline yang membuat copywriting dan gambar.\\n\\nInput berupa JSON: mode, pesan_user, ada_gambar_referensi, konteks_revisi, konteks_rencana.\\n- mode \\\"plan\\\": user memberi arahan untuk rencana konten yang sedang menunggu. Kalau user menyebut topik/tema baru, isi \\\"tema\\\". Kalau hanya memberi arahan gaya/isi, kosongkan \\\"tema\\\" supaya tema kalender tetap dipakai.\\n- mode \\\"revisi\\\": ada preview konten yang belum diapprove (lihat konteks_revisi). User mungkin langsung mengetik komentar tanpa menekan tombol Revisi. Anggap pesan sebagai revisi untuk konten itu, KECUALI user jelas meminta topik/konten yang sama sekali baru, maka intent \\\"konten_baru\\\". Pertahankan tema kecuali user jelas minta ganti. \\\"arahan\\\" harus menjelaskan apa yang diubah dan apa yang dipertahankan.\\n- mode \\\"baru\\\": user minta konten baru di luar jadwal. Isi \\\"tema\\\" dengan topik yang dimaksud.\\n- Kalau pesan hanya sapaan, pertanyaan, atau bukan permintaan konten, intent \\\"ngobrol\\\" dan balas singkat serta tanya konten apa yang diinginkan.\\n\\nPilih intent dengan tepat, ini menentukan apa yang dibuat ulang:\\n- \\\"revisi_copy\\\": user hanya ingin mengubah teks/caption (kata, nada, panjang, ajakan). Gambar dipertahankan persis.\\n- \\\"revisi_visual\\\": user hanya ingin mengubah gambar/visual/warna/layout. Caption dipertahankan persis.\\n- \\\"revisi_semua\\\": perubahan menyangkut keduanya, atau tidak jelas.\\n- \\\"ganti_tema\\\": user ingin topik yang sama sekali berbeda untuk konten ini.\\n- \\\"konten_baru\\\": user meminta konten lain di luar konten yang sedang direvisi (hanya di mode revisi).\\n- \\\"tambah_arahan\\\": arahan tambahan untuk rencana (mode plan).\\n\\nBalas HANYA dengan JSON valid:\\n{\\\"intent\\\":\\\"revisi_copy|revisi_visual|revisi_semua|ganti_tema|konten_baru|tambah_arahan|ngobrol\\\",\\\"tema\\\":\\\"\\\",\\\"pilar\\\":\\\"\\\",\\\"format_visual\\\":\\\"single atau carousel atau kosong\\\",\\\"jumlah_slide\\\":0,\\\"arahan\\\":\\\"instruksi jelas untuk copywriter dan desainer, bahasa Indonesia, tanpa mengulang pesan mentah\\\",\\\"balasan\\\":\\\"1-2 kalimat konfirmasi santai ke user, bahasa Indonesia\\\",\\\"aturan_baru\\\":\\\"\\\"}\\n\\nATURAN BELAJAR: kalau koreksi user bersifat PERMANEN dan berlaku untuk konten-konten berikutnya (mis. logo harus persis, CTA hanya di slide tertentu, gaya bahasa, warna, hal yang dilarang), tulis satu kalimat aturan umum yang singkat dan jelas di \\\"aturan_baru\\\" (tanpa menyebut tema konten tertentu). Kalau koreksi hanya untuk konten ini saja, kosongkan \\\"aturan_baru\\\".\\n\\nAturan: format single = 1 slide, carousel = 2 sampai 10 slide. Kosongkan field yang tidak diubah user. Kalau ada gambar referensi, sebut di arahan bahwa gambar itu dipakai sebagai acuan visual. Jangan mengarang data atau angka. Nada balasan santai, bukan formal.\";\nconst user = JSON.stringify({ mode, pesan_user: e.text, ada_gambar_referensi: !!ref, konteks_revisi: mode === 'revisi' ? ctx : null, konteks_rencana: mode === 'plan' ? (plan ? { tema_sudah_diatur: plan.Tema || '', arahan_sebelumnya: plan.Instruksi || '' } : e.reply_to_text) : null });\nreturn [{ json: { mode, ref, rev, plan, body: { model: 'gpt-5.4-mini', response_format: { type: 'json_object' }, messages: [{ role: 'system', content: SYS }, { role: 'user', content: user }] } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        2112
+      ],
+      "id": "2ce1b80b-acdb-409c-a170-ed4af6f080fb",
+      "name": "Siapkan Otak"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        2112
+      ],
+      "id": "638e33a0-4dbe-41cd-b927-8543291aa45d",
+      "name": "Otak - OpenAI",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "openAiApi": {
+          "id": "uziuVTI0Cyz6gWvY",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Siapkan Otak').first().json;\nconst e = $('Msg - Ekstrak').first().json;\nlet out;\ntry { out = JSON.parse($json.choices[0].message.content); } catch (x) { out = { intent: 'tambah_arahan', arahan: e.text, balasan: 'Oke, arahannya aku catat ya.' }; }\nconst rev = ctx.rev;\nconst plan = ctx.plan;\nconst arahan = out.arahan || e.text;\nconst fmt = out.format_visual || (plan ? plan['Format Visual'] : '') || '';\nconst jml = Number(out.jumlah_slide) || Number(plan ? plan['Jumlah Slide'] : 0) || 0;\nreturn [{ json: {\n  mode: (ctx.mode === 'revisi' && out.intent === 'konten_baru') ? 'baru' : ctx.mode, chat_id: e.chat_id, ref: ctx.ref || (plan ? plan.Gambar : '') || '',\n  intent: out.intent || 'tambah_arahan', aturan_baru: String(out.aturan_baru || '').trim(),\n  tema: out.tema || (plan ? plan.Tema : '') || '', pilar: out.pilar || (plan ? plan.Pilar : '') || '',\n  format_visual: fmt, jumlah_slide: jml,\n  arahan, balasan: out.balasan || 'Oke, diproses ya.',\n  plan_ts: plan ? plan.Timestamp : '',\n  plan_instruksi: plan && plan.Instruksi ? plan.Instruksi + ' | ' + arahan : arahan,\n  rev_message_id: rev ? rev['Message ID'] : '', rev_tanggal: rev ? rev.Tanggal : '', rev_slot: rev ? rev.Slot : '',\n  rev_tema: rev ? rev.Tema : '', rev_caption: rev ? String(rev['Caption IG'] || '') : '', rev_images: rev ? String(rev['Image URL'] || '') : '',\n  rev_slides: rev ? String(rev['Image URL'] || '').split(',').filter(Boolean).length : 0\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        2112
+      ],
+      "id": "44e785fc-5ca5-432d-8994-4f220d671946",
+      "name": "Tafsir Hasil"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "08b44d53-9fec-4226-93d2-dca9449ab622",
+              "leftValue": "={{ $json.intent }}",
+              "rightValue": "ngobrol",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        2272
+      ],
+      "id": "640569da-a807-4031-85c1-4aa7061fd010",
+      "name": "Ngobrol?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.balasan }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        2272
+      ],
+      "id": "264c7a14-7014-4cee-bdfa-ed32fc5a57f4",
+      "name": "Balas Ngobrol",
+      "webhookId": "d23ec899-1475-4a07-8381-65621f674817",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "deb6e185-7a5d-4c19-8642-6f2dd7ba676d",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "plan",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        2608
+      ],
+      "id": "8e806e56-7ce8-41ba-b4b4-4845be51cdbb",
+      "name": "Mode Plan?"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.plan_ts || 'T' + $now.toMillis() }}",
+            "Instruksi": "={{ $json.plan_instruksi + ($json.ref ? ' (gambar referensi: ' + $json.ref + ')' : '') }}",
+            "Gambar": "={{ $json.ref }}",
+            "Status": "new",
+            "Tema": "={{ $json.tema }}",
+            "Pilar": "={{ $json.pilar }}",
+            "Format Visual": "={{ $json.format_visual }}",
+            "Jumlah Slide": "={{ $json.jumlah_slide || \"\" }}"
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instruksi",
+              "displayName": "Instruksi",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gambar",
+              "displayName": "Gambar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tema",
+              "displayName": "Tema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pilar",
+              "displayName": "Pilar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Format Visual",
+              "displayName": "Format Visual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Jumlah Slide",
+              "displayName": "Jumlah Slide",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        2608
+      ],
+      "id": "57a1bb69-973c-475d-b357-0c0fd49dff0d",
+      "name": "Tulis Override",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Tafsir Hasil').first().json.chat_id }}",
+        "text": "={{ '✅ ' + $('Tafsir Hasil').first().json.balasan + '\\n\\nArahan ini dipakai saat konten dibuat setelah masa tunggu.' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        2608
+      ],
+      "id": "022aa65d-1f92-407d-801d-b04b8ea6c53a",
+      "name": "Balas Override",
+      "webhookId": "3c521a48-3e93-4d76-9eae-7e87745feeed",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const j = $json;\nconst isRev = j.mode === 'revisi';\nlet revisi = 'semua';\nif (isRev) {\n  if (j.intent === 'revisi_copy' && j.rev_images) revisi = 'copy';\n  else if (j.intent === 'revisi_visual' && j.rev_caption) revisi = 'visual';\n}\nconst fmt = j.format_visual || (isRev ? (j.rev_slides > 1 ? 'carousel' : 'single') : 'single');\nlet jml = j.jumlah_slide || (isRev ? (j.rev_slides || 1) : 1);\nif (fmt === 'single') jml = 1;\nconst tema = j.tema || (isRev ? j.rev_tema : j.arahan);\nconst instruksi = isRev\n  ? 'REVISI dari versi sebelumnya. Caption sebelumnya: \"' + j.rev_caption.slice(0, 600) + '\". Arahan revisi: ' + j.arahan\n  : j.arahan;\nreturn [{ json: {\n  chat_id: j.chat_id, balasan: j.balasan, mode: j.mode, rev_message_id: j.rev_message_id,\n  Tanggal: isRev && j.rev_tanggal ? j.rev_tanggal : $now.toFormat('yyyy-MM-dd'),\n  Slot: isRev && j.rev_slot ? j.rev_slot : ($now.hour < 12 ? 'pagi' : 'sore'),\n  Pilar: j.pilar || 'umum', Tema: tema, 'Format Visual': fmt, 'Jumlah Slide': jml,\n  Instruksi: instruksi, Gambar: j.ref || '',\n  Revisi: revisi, CaptionLama: isRev ? j.rev_caption : '', GambarLama: isRev ? j.rev_images : ''\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        2608
+      ],
+      "id": "83523fa7-ce12-4484-ba3d-4c7f8130b8e0",
+      "name": "Siapkan Run"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0DTvyCMg7usfskeK",
+          "mode": "list",
+          "cachedResultName": "Pipeline Harian"
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        2608
+      ],
+      "id": "1e413de6-d434-4e96-af61-17e574aa0a32",
+      "name": "Jalankan Pipeline"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ '⏳ ' + $json.balasan + '\\n\\n' + ($json.Revisi === 'copy' ? 'Cuma teks yang dibuat ulang, gambar tetap. ' : $json.Revisi === 'visual' ? 'Cuma gambar yang dibuat ulang, caption tetap. ' : '') + 'Preview baru dikirim ke sini sebentar lagi.' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        64,
+        2784
+      ],
+      "id": "9c045898-ebbe-4c70-af2b-f05c321f6258",
+      "name": "Balas Mulai",
+      "webhookId": "15898aaa-2e0c-4d9f-aaee-da8effd22fd5",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bdf2e884-0d57-4a18-b0aa-431be90f7b90",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "revisi",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        2784
+      ],
+      "id": "8670dead-eeb3-4dd4-993c-a8e55aa9ecc5",
+      "name": "Mode Revisi?"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1,
+          "mode": "list",
+          "cachedResultName": "Log Konten",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit#gid=1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message ID": "={{ $json.rev_message_id }}",
+            "Status": "direvisi"
+          },
+          "matchingColumns": [
+            "Message ID"
+          ],
+          "schema": [
+            {
+              "id": "Message ID",
+              "displayName": "Message ID",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        2784
+      ],
+      "id": "b72f7e85-c1cd-410a-b4d4-fd5452f219c9",
+      "name": "Tandai Direvisi",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        2112
+      ],
+      "id": "878fcdf4-f944-4a27-bcc5-0458e9827062",
+      "name": "Cek Menunggu",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "51f2c218-d1f7-4268-ae06-168ac55e4805",
+              "leftValue": "={{ $('Telegram Trigger').first().json.callback_query.data }}",
+              "rightValue": "lanjut",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        992,
+        112
+      ],
+      "id": "0a66d53e-d6f1-4280-80b3-f8bb15efeda9",
+      "name": "Lanjut?"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "list",
+          "cachedResultName": "Database Konten AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2,
+          "mode": "list",
+          "cachedResultName": "Override"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        288
+      ],
+      "id": "103ec98c-ae24-4eda-85ce-fba315eb937f",
+      "name": "Cari Menunggu",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json).filter(r => ['menunggu', 'new'].includes(String(r.Status || '').trim().toLowerCase()) && r.ResumeUrl);\nconst r = rows.length ? rows[rows.length - 1] : null;\nreturn [{ json: { url: r ? r.ResumeUrl : '' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        288
+      ],
+      "id": "b42e6cdd-289f-4d54-bebf-c80708dc558f",
+      "name": "Pilih Resume"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url || 'http://localhost/none' }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        288
+      ],
+      "id": "9572b1fc-f398-4ecd-b1fb-a0d6a390d629",
+      "name": "Resume Pipeline",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.callback_query.message.chat.id }}",
+        "text": "={{ $('Pilih Resume').first().json.url ? '▶️ Oke, langsung dibuat sekarang.' : 'Masa tunggu rencana ini sudah lewat, kontennya sudah atau sedang dibuat.' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        288
+      ],
+      "id": "7e99e24a-5db8-4326-9d1a-cc374824076c",
+      "name": "Balas Lanjut",
+      "webhookId": "ddf00af9-f357-49a8-b840-dc2a5a3f7fd0",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ab1",
+              "leftValue": "={{ $json.aturan_baru }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        2272
+      ],
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Aturan Baru?"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1isDThb4b_dL5pvUjYFW_sEZp1VpUMJPHneTktEJ2M9g",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 4,
+          "mode": "list",
+          "cachedResultName": "Aturan Belajar"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Akun": "scalewise.id",
+            "Tanggal": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Aturan": "={{ $json.aturan_baru }}",
+            "Sumber": "koreksi user via Telegram"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        2272
+      ],
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Simpan Aturan",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "googleApi": {
+          "id": "WOzpgvu3xNWDNIAw",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Tafsir Hasil').first().json.chat_id }}",
+        "text": "={{ '🧠 Aturan baru kucatat & akan dipakai di konten berikutnya: ' + $('Tafsir Hasil').first().json.aturan_baru }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        2272
+      ],
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Balas Aturan",
+      "webhookId": "43d3840a-63d3-44e5-9bd3-5fc43c7822d3",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1500,
+      "credentials": {
+        "telegramApi": {
+          "id": "4yNZARBNY2WzSzS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1. Penerima Telegram dan Tombol (Approve / Revisi / Lanjut)",
+        "height": 440,
+        "width": 1210,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b77fbbc1-7be8-437e-be44-e33d60bd61ad",
+      "name": "Blok 1"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Approve: Posting ke Threads",
+        "height": 270,
+        "width": 1210,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        512
+      ],
+      "id": "1a7d0a5a-7867-4c5a-84d8-5509944f5da3",
+      "name": "Blok 2"
+    },
+    {
+      "parameters": {
+        "content": "## 3. Approve: Posting ke Instagram",
+        "height": 440,
+        "width": 1210,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        832
+      ],
+      "id": "ebb58cf4-468d-460a-b244-68b3182d660f",
+      "name": "Blok 3"
+    },
+    {
+      "parameters": {
+        "content": "## 4. Update Status dan Konfirmasi",
+        "height": 270,
+        "width": 980,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1344
+      ],
+      "id": "7ce6cb07-dab7-4eaf-8a7f-9e7990a6b39a",
+      "name": "Blok 4"
+    },
+    {
+      "parameters": {
+        "content": "## 5. Pesan Masuk: Ekstrak Teks dan Foto Referensi",
+        "height": 270,
+        "width": 980,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1664
+      ],
+      "id": "15e1509b-075f-4f7e-a089-896a0a6026c8",
+      "name": "Blok 5"
+    },
+    {
+      "parameters": {
+        "content": "## 6. Otak AI: Tafsir Arahan dan Belajar Aturan",
+        "height": 440,
+        "width": 1210,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2000
+      ],
+      "id": "846563c4-a907-459d-a31a-4f134ba5ddcf",
+      "name": "Blok 6"
+    },
+    {
+      "parameters": {
+        "content": "## 7. Jalankan Pipeline dari Arahan (rencana / revisi / konten baru)",
+        "height": 440,
+        "width": 1210
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        2496
+      ],
+      "id": "e9fe04d6-2cd7-4b73-b27f-2715f75fa56c",
+      "name": "Blok 7"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Callback?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Query a callback": {
+      "main": [
+        [
+          {
+            "node": "Lanjut?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Status Revisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Threads - Create Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Create Container": {
+      "main": [
+        [
+          {
+            "node": "Wait Threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Threads": {
+      "main": [
+        [
+          {
+            "node": "Threads - Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Publish": {
+      "main": [
+        [
+          {
+            "node": "Threads - Get Permalink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads - Get Permalink": {
+      "main": [
+        [
+          {
+            "node": "IG - Parse Slides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Container": {
+      "main": [
+        [
+          {
+            "node": "Wait IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait IG": {
+      "main": [
+        [
+          {
+            "node": "IG - Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Publish": {
+      "main": [
+        [
+          {
+            "node": "IG - Get Permalink",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Get Permalink": {
+      "main": [
+        [
+          {
+            "node": "Update Status Terposting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status Terposting": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Konfirmasi Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Konfirmasi Posting": {
+      "main": [
+        [
+          {
+            "node": "Update Status Revisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status Revisi": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Konfirmasi Revisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Parse Slides": {
+      "main": [
+        [
+          {
+            "node": "IG - Carousel?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Carousel?": {
+      "main": [
+        [
+          {
+            "node": "IG - Create Slide Container",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IG - Create Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Slide Container": {
+      "main": [
+        [
+          {
+            "node": "IG - Collect Children",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Collect Children": {
+      "main": [
+        [
+          {
+            "node": "Wait IG Slides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait IG Slides": {
+      "main": [
+        [
+          {
+            "node": "IG - Create Carousel Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG - Create Carousel Container": {
+      "main": [
+        [
+          {
+            "node": "Wait IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback?": {
+      "main": [
+        [
+          {
+            "node": "Answer Query a callback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Msg - Ekstrak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Msg - Ekstrak": {
+      "main": [
+        [
+          {
+            "node": "Ada Foto?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ada Foto?": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Ambil Foto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cari Revisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Ambil Foto": {
+      "main": [
+        [
+          {
+            "node": "Drive - Simpan Referensi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Drive - Simpan Referensi": {
+      "main": [
+        [
+          {
+            "node": "Cari Revisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cari Revisi": {
+      "main": [
+        [
+          {
+            "node": "Cek Menunggu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Otak": {
+      "main": [
+        [
+          {
+            "node": "Otak - OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Otak - OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Tafsir Hasil",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tafsir Hasil": {
+      "main": [
+        [
+          {
+            "node": "Ngobrol?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aturan Baru?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ngobrol?": {
+      "main": [
+        [
+          {
+            "node": "Balas Ngobrol",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mode Plan?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode Plan?": {
+      "main": [
+        [
+          {
+            "node": "Tulis Override",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Siapkan Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tulis Override": {
+      "main": [
+        [
+          {
+            "node": "Balas Override",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Siapkan Run": {
+      "main": [
+        [
+          {
+            "node": "Jalankan Pipeline",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Balas Mulai",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mode Revisi?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mode Revisi?": {
+      "main": [
+        [
+          {
+            "node": "Tandai Direvisi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Menunggu": {
+      "main": [
+        [
+          {
+            "node": "Siapkan Otak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lanjut?": {
+      "main": [
+        [
+          {
+            "node": "Cari Menunggu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cari Menunggu": {
+      "main": [
+        [
+          {
+            "node": "Pilih Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pilih Resume": {
+      "main": [
+        [
+          {
+            "node": "Resume Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Balas Lanjut",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aturan Baru?": {
+      "main": [
+        [
+          {
+            "node": "Simpan Aturan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Simpan Aturan": {
+      "main": [
+        [
+          {
+            "node": "Balas Aturan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "39300234-5489-4429-824e-72b8bcc191cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "6188fc89056339638d52cd423afee0238da6de1584cbd1586ac9f7610a15333e"
+  },
+  "nodeGroups": [],
+  "id": "U5WXziAdgRJGoI5m",
+  "tags": []
+}
